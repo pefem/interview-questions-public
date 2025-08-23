@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, timedelta
 
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -53,9 +53,12 @@ class ListingList(APITestCase):
         test that an assignment can be created against an existing listing
         """
 
+        start_date = date.today() + timedelta(days=1)  # tomorrow
+        end_date = start_date + timedelta(days=2)
+
         data = {
-            "start_date": date(2025, 8, 24),
-            "end_date": date(2025, 8, 25),
+            "start_date": start_date,
+            "end_date": end_date,
             "listing": self.listing_1.id,
         }
 
