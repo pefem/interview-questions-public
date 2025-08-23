@@ -2,11 +2,15 @@ from datetime import date
 
 from rest_framework import status
 from rest_framework.test import APITestCase
-from .models import Listing, Assignment
+
+from .models import Assignment, Listing
 
 
 class ListingList(APITestCase):
     def setUp(self):
+        self.listings_url = "/listings/"
+        self.assignments_url = "/assignments/create/"
+
         self.listing_1 = Listing.objects.create(first_name="Ross", last_name="Geller")
         self.listing_2 = Listing.objects.create(first_name="Phoebe", last_name="Buffay")
         self.assignment_1 = Assignment.objects.create(
@@ -21,11 +25,11 @@ class ListingList(APITestCase):
         )
 
     def test_get_200(self):
-        response = self.client.get("/listings/")
+        response = self.client.get(self.listings_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_get_data(self):
-        response = self.client.get("/listings/")
+        response = self.client.get(self.listings_url)
         self.assertEqual(
             response.data,
             [
@@ -43,3 +47,20 @@ class ListingList(APITestCase):
                 },
             ],
         )
+
+    def test_create_assignment_200(self):
+        """
+        test that an assignment can be created against an existing listing
+        """
+
+        data = {
+            "start_date": date(2025, 8, 24),
+            "end_date": date(2025, 8, 25),
+            "listing": self.listing_1.id,
+        }
+
+        response = self.client.post(self.assignments_url, data=data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Assignment.objects.count(), 3)
+        assignment = Assignment.objects.first()
+        self.assertEqual(assignment.listing, self.listing_1)
