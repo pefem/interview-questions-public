@@ -17,11 +17,20 @@ class AssignmentSerializer(serializers.ModelSerializer):
         fields = ["id", "start_date", "end_date", "listing"]
 
     def validate_start_date(self, value):
+        """
+        Method will validate the start_date to ensure its greater than the current date.
+        """
+
         if value <= date.today():
-            raise serializers.ValidationError("Start date must be tomorrow or later.")
+            raise serializers.ValidationError(
+                "Start date must be greater than today's date."
+            )
         return value
 
-    def validate_assignment(self, data):
+    def validate(self, data):
+        """
+        Method will validate provided dates against exsiting dates to check for overlap.
+        """
         listing = data.get("listing")
         start_date = data.get("start_date")
         end_date = data.get("end_date")
