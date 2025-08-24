@@ -6,4 +6,6 @@ from .serializers import ListingSerializer
 
 class ListingList(generics.ListAPIView):
     serializer_class = ListingSerializer
-    queryset = Listing.objects.all()
+
+    def get_queryset(self):
+        return Listing.objects.all().prefetch_related("pets", "assignments")
